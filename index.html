@@ -420,11 +420,6 @@
     </div>
 
     <script>
-        // Use relative path for API to work both locally and on Vercel
-        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-            ? 'http://localhost:8000' 
-            : '/api';
-
         // Basic Calculator Functions
         function appendToDisplay(value) {
             document.getElementById('display').value += value;
@@ -434,26 +429,14 @@
             document.getElementById('display').value = '';
         }
 
-        async function calculate() {
+        function calculate() {
             const expression = document.getElementById('display').value;
             if (!expression) return;
 
             try {
                 const result = eval(expression);
                 document.getElementById('display').value = result;
-
-                // Save to backend
-                await fetch(`${API_URL}/calculate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        expression: expression,
-                        result: result.toString()
-                    })
-                });
-
-                // Refresh history
-                loadHistory();
+                addToHistory(expression, result);
             } catch (error) {
                 document.getElementById('display').value = 'Error';
                 setTimeout(clearDisplay, 1500);
@@ -553,31 +536,17 @@
             }
         }
 
-        async function calculateScientific() {
+        function calculateScientific() {
             const expression = document.getElementById('scientificDisplay').value;
             if (!expression) return;
 
             try {
-                // Replace ^ with ** for JavaScript evaluation
                 let jsExpression = expression.replace(/\^/g, '**');
-                // Replace π and e
                 jsExpression = jsExpression.replace(/π/g, Math.PI).replace(/e/g, Math.E);
                 
                 const result = eval(jsExpression);
                 document.getElementById('scientificDisplay').value = parseFloat(result.toFixed(8));
-
-                // Save to backend
-                await fetch(`${API_URL}/calculate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        expression: expression,
-                        result: parseFloat(result.toFixed(8)).toString()
-                    })
-                });
-
-                // Refresh history
-                loadHistory();
+                addToHistory(expression, parseFloat(result.toFixed(8)));
             } catch (error) {
                 document.getElementById('scientificDisplay').value = 'Error';
                 setTimeout(clearScientificDisplay, 1500);
@@ -585,7 +554,7 @@
         }
 
         // Financial Calculator Functions
-        async function calculateFinancial() {
+        function calculateFinancial() {
             const principal = parseFloat(document.getElementById('principal').value);
             const rate = parseFloat(document.getElementById('rate').value);
             const time = parseFloat(document.getElementById('time').value);
@@ -596,42 +565,54 @@
                 return;
             }
 
-            try {
-                const response = await fetch(`${API_URL}/financial/calculate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        principal,
-                        rate,
-                        time,
-                        calculation_type: calcType
-                    })
-                });
+            let result = 0;
+            let expression = '';
 
-                const data = await response.json();
-                const resultDiv = document.getElementById('financialResult');
-                resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `<strong>Result:</strong> $${data.result}<br><small>${data.expression}</small>`;
-
-                // Refresh history
-                loadHistory();
-            } catch (error) {
-                alert('Error calculating: ' + error.message);
+            if (calcType === 'loan') {
+                const monthlyRate = rate / 100 / 12;
+                const months = time * 12;
+                const monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+                result = round(monthlyPayment, 2);
+                expression = `Loan Payment: $${principal} at ${rate}% for ${time} years`;
+            } else if (calcType === 'compound') {
+                const compoundAmount = principal * Math.pow(1 + rate / 100, time);
+                result = round(compoundAmount, 2);
+                expression = `Compound Interest: $${principal} at ${rate}% for ${time} years`;
+            } else if (calcType === 'simple') {
+                const simpleInterest = principal * (rate / 100) * time;
+                const totalAmount = principal + simpleInterest;
+                result = round(totalAmount, 2);
+                expression = `Simple Interest: $${principal} at ${rate}% for ${time} years`;
             }
+
+            const resultDiv = document.getElementById('financialResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `<strong>Result:</strong> $${result}<br><small>${expression}</small>`;
+            
+            addToHistory(expression, `$${result}`);
         }
 
-        // History Functions
-        async function loadHistory() {
-            try {
-                const response = await fetch(`${API_URL}/history`);
-                const history = await response.json();
-                displayHistory(history);
-            } catch (error) {
-                console.error('Error loading history:', error);
-            }
+        function round(num, decimals) {
+            return Number(Math.round(num + 'e' + decimals) + 'e-' + decimals);
         }
 
-        function displayHistory(history) {
+        // History Functions (using localStorage)
+        function addToHistory(expression, result) {
+            const history = JSON.parse(localStorage.getItem('calculatorHistory') || '[]');
+            const newItem = {
+                id: Date.now(),
+                expression: expression,
+                result: result.toString(),
+                timestamp: new Date().toISOString()
+            };
+            history.unshift(newItem);
+            if (history.length > 50) history.pop();
+            localStorage.setItem('calculatorHistory', JSON.stringify(history));
+            displayHistory();
+        }
+
+        function displayHistory() {
+            const history = JSON.parse(localStorage.getItem('calculatorHistory') || '[]');
             const container = document.getElementById('historyContainer');
             
             if (history.length === 0) {
@@ -651,28 +632,21 @@
             `).join('');
         }
 
-        async function deleteHistoryItem(id) {
-            try {
-                await fetch(`${API_URL}/history/${id}`, { method: 'DELETE' });
-                loadHistory();
-            } catch (error) {
-                alert('Error deleting item: ' + error.message);
-            }
+        function deleteHistoryItem(id) {
+            const history = JSON.parse(localStorage.getItem('calculatorHistory') || '[]');
+            const newHistory = history.filter(item => item.id !== id);
+            localStorage.setItem('calculatorHistory', JSON.stringify(newHistory));
+            displayHistory();
         }
 
-        async function clearHistory() {
+        function clearHistory() {
             if (!confirm('Are you sure you want to clear all history?')) return;
-            
-            try {
-                await fetch(`${API_URL}/history`, { method: 'DELETE' });
-                loadHistory();
-            } catch (error) {
-                alert('Error clearing history: ' + error.message);
-            }
+            localStorage.removeItem('calculatorHistory');
+            displayHistory();
         }
 
         // Load history on page load
-        loadHistory();
+        displayHistory();
     </script>
 </body>
 </html>
