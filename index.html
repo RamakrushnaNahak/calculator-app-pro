@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .calculator-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        /* Basic Calculator Styles */
+        .display {
+            width: 100%;
+            height: 80px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 2em;
+            text-align: right;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 1.5em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .number {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .operator {
+            background: #667eea;
+            color: white;
+        }
+
+        .equals {
+            background: #764ba2;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .clear {
+            background: #dc3545;
+            color: white;
+        }
+
+        .scientific {
+            background: #17a2b8;
+            color: white;
+            font-size: 1.1em;
+        }
+
+        .scientific-display {
+            width: 100%;
+            height: 80px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 2em;
+            text-align: right;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .scientific-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .scientific-buttons button {
+            padding: 15px;
+            font-size: 1em;
+        }
+
+        /* Financial Calculator Styles */
+        .financial-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input, select {
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .financial-result {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+            display: none;
+        }
+
+        /* History Styles */
+        .history-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: #e9ecef;
+        }
+
+        .history-expression {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .history-result {
+            color: #667eea;
+            font-weight: bold;
+            margin-left: 20px;
+        }
+
+        .history-time {
+            color: #999;
+            font-size: 0.9em;
+            margin-left: 20px;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .clear-history-btn {
+            background: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1em;
+            margin-top: 15px;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .buttons {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .scientific-buttons {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 5px;
+            }
+
+            .scientific-buttons button {
+                padding: 12px;
+                font-size: 0.9em;
+            }
+
+            button {
+                padding: 15px;
+                font-size: 1.2em;
+            }
+
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .history-result,
+            .history-time {
+                margin-left: 0;
+                margin-top: 5px;
+            }
+
+            .delete-btn {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 Calculator App</h1>
+
+        <!-- Basic Calculator -->
+        <div class="calculator-section">
+            <h2 class="section-title">Basic Calculator</h2>
+            <input type="text" class="display" id="display" readonly value="">
+            <div class="buttons">
+                <button class="clear" onclick="clearDisplay()">C</button>
+                <button class="operator" onclick="appendToDisplay('(')">(</button>
+                <button class="operator" onclick="appendToDisplay(')')">)</button>
+                <button class="operator" onclick="appendToDisplay('/')">÷</button>
+                
+                <button class="number" onclick="appendToDisplay('7')">7</button>
+                <button class="number" onclick="appendToDisplay('8')">8</button>
+                <button class="number" onclick="appendToDisplay('9')">9</button>
+                <button class="operator" onclick="appendToDisplay('*')">×</button>
+                
+                <button class="number" onclick="appendToDisplay('4')">4</button>
+                <button class="number" onclick="appendToDisplay('5')">5</button>
+                <button class="number" onclick="appendToDisplay('6')">6</button>
+                <button class="operator" onclick="appendToDisplay('-')">−</button>
+                
+                <button class="number" onclick="appendToDisplay('1')">1</button>
+                <button class="number" onclick="appendToDisplay('2')">2</button>
+                <button class="number" onclick="appendToDisplay('3')">3</button>
+                <button class="operator" onclick="appendToDisplay('+')">+</button>
+                
+                <button class="number" onclick="appendToDisplay('0')">0</button>
+                <button class="number" onclick="appendToDisplay('.')">.</button>
+                <button class="equals" onclick="calculate()">=</button>
+            </div>
+        </div>
+
+        <!-- Scientific Calculator -->
+        <div class="calculator-section">
+            <h2 class="section-title">Scientific Calculator</h2>
+            <input type="text" class="scientific-display" id="scientificDisplay" readonly value="">
+            <div class="scientific-buttons">
+                <button class="scientific" onclick="scientificFunction('sin')">sin</button>
+                <button class="scientific" onclick="scientificFunction('cos')">cos</button>
+                <button class="scientific" onclick="scientificFunction('tan')">tan</button>
+                <button class="scientific" onclick="scientificFunction('log')">log</button>
+                <button class="scientific" onclick="scientificFunction('ln')">ln</button>
+                
+                <button class="scientific" onclick="scientificFunction('asin')">sin⁻¹</button>
+                <button class="scientific" onclick="scientificFunction('acos')">cos⁻¹</button>
+                <button class="scientific" onclick="scientificFunction('atan')">tan⁻¹</button>
+                <button class="scientific" onclick="scientificFunction('sqrt')">√</button>
+                <button class="scientific" onclick="scientificFunction('pow')">x^y</button>
+                
+                <button class="scientific" onclick="scientificFunction('pow2')">x²</button>
+                <button class="scientific" onclick="scientificFunction('pow3')">x³</button>
+                <button class="scientific" onclick="scientificFunction('exp')">e^x</button>
+                <button class="scientific" onclick="scientificFunction('fact')">n!</button>
+                <button class="scientific" onclick="scientificFunction('abs')">|x|</button>
+                
+                <button class="scientific" onclick="scientificAppend('π')">π</button>
+                <button class="scientific" onclick="scientificAppend('e')">e</button>
+                <button class="scientific" onclick="scientificAppend('(')">(</button>
+                <button class="scientific" onclick="scientificAppend(')')">)</button>
+                <button class="scientific" onclick="scientificAppend('^')">^</button>
+                
+                <button class="number" onclick="scientificAppend('7')">7</button>
+                <button class="number" onclick="scientificAppend('8')">8</button>
+                <button class="number" onclick="scientificAppend('9')">9</button>
+                <button class="operator" onclick="scientificAppend('/')">÷</button>
+                <button class="clear" onclick="clearScientificDisplay()">C</button>
+                
+                <button class="number" onclick="scientificAppend('4')">4</button>
+                <button class="number" onclick="scientificAppend('5')">5</button>
+                <button class="number" onclick="scientificAppend('6')">6</button>
+                <button class="operator" onclick="scientificAppend('*')">×</button>
+                <button class="operator" onclick="scientificAppend('%')">%</button>
+                
+                <button class="number" onclick="scientificAppend('1')">1</button>
+                <button class="number" onclick="scientificAppend('2')">2</button>
+                <button class="number" onclick="scientificAppend('3')">3</button>
+                <button class="operator" onclick="scientificAppend('-')">−</button>
+                <button class="equals" onclick="calculateScientific()">=</button>
+                
+                <button class="number" onclick="scientificAppend('0')">0</button>
+                <button class="number" onclick="scientificAppend('.')">.</button>
+                <button class="scientific" onclick="scientificFunction('1/x')">1/x</button>
+                <button class="operator" onclick="scientificAppend('+')">+</button>
+                <button class="scientific" onclick="scientificFunction('deg')">DEG</button>
+            </div>
+        </div>
+
+        <!-- Financial Calculator -->
+        <div class="calculator-section">
+            <h2 class="section-title">Financial Calculator</h2>
+            <div class="financial-form">
+                <div class="form-group">
+                    <label for="principal">Principal Amount ($)</label>
+                    <input type="number" id="principal" placeholder="e.g., 10000" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="rate">Interest Rate (%)</label>
+                    <input type="number" id="rate" placeholder="e.g., 5" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="time">Time (years)</label>
+                    <input type="number" id="time" placeholder="e.g., 5" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="calcType">Calculation Type</label>
+                    <select id="calcType">
+                        <option value="loan">Loan Payment</option>
+                        <option value="compound">Compound Interest</option>
+                        <option value="simple">Simple Interest</option>
+                    </select>
+                </div>
+            </div>
+            <button class="calculate-btn" onclick="calculateFinancial()">Calculate</button>
+            <div class="financial-result" id="financialResult"></div>
+        </div>
+
+        <!-- History -->
+        <div class="calculator-section">
+            <h2 class="section-title">Calculation History</h2>
+            <div class="history-container" id="historyContainer">
+                <div class="empty-history">No calculations yet</div>
+            </div>
+            <button class="clear-history-btn" onclick="clearHistory()">Clear All History</button>
+        </div>
+    </div>
+
+    <script>
+        // Use relative path for API to work both locally and on Vercel
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost:8000' 
+            : '/api';
+
+        // Basic Calculator Functions
+        function appendToDisplay(value) {
+            document.getElementById('display').value += value;
+        }
+
+        function clearDisplay() {
+            document.getElementById('display').value = '';
+        }
+
+        async function calculate() {
+            const expression = document.getElementById('display').value;
+            if (!expression) return;
+
+            try {
+                const result = eval(expression);
+                document.getElementById('display').value = result;
+
+                // Save to backend
+                await fetch(`${API_URL}/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        expression: expression,
+                        result: result.toString()
+                    })
+                });
+
+                // Refresh history
+                loadHistory();
+            } catch (error) {
+                document.getElementById('display').value = 'Error';
+                setTimeout(clearDisplay, 1500);
+            }
+        }
+
+        // Scientific Calculator Functions
+        let isDegreeMode = true;
+
+        function scientificAppend(value) {
+            document.getElementById('scientificDisplay').value += value;
+        }
+
+        function clearScientificDisplay() {
+            document.getElementById('scientificDisplay').value = '';
+        }
+
+        function toRadians(angle) {
+            return isDegreeMode ? angle * (Math.PI / 180) : angle;
+        }
+
+        function toDegrees(radians) {
+            return isDegreeMode ? radians * (180 / Math.PI) : radians;
+        }
+
+        function factorial(n) {
+            if (n < 0) return NaN;
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+
+        function scientificFunction(func) {
+            const display = document.getElementById('scientificDisplay');
+            const currentValue = parseFloat(display.value) || 0;
+
+            switch(func) {
+                case 'sin':
+                    display.value = Math.sin(toRadians(currentValue)).toFixed(8);
+                    break;
+                case 'cos':
+                    display.value = Math.cos(toRadians(currentValue)).toFixed(8);
+                    break;
+                case 'tan':
+                    display.value = Math.tan(toRadians(currentValue)).toFixed(8);
+                    break;
+                case 'asin':
+                    display.value = toDegrees(Math.asin(currentValue)).toFixed(8);
+                    break;
+                case 'acos':
+                    display.value = toDegrees(Math.acos(currentValue)).toFixed(8);
+                    break;
+                case 'atan':
+                    display.value = toDegrees(Math.atan(currentValue)).toFixed(8);
+                    break;
+                case 'log':
+                    display.value = Math.log10(currentValue).toFixed(8);
+                    break;
+                case 'ln':
+                    display.value = Math.log(currentValue).toFixed(8);
+                    break;
+                case 'sqrt':
+                    display.value = Math.sqrt(currentValue).toFixed(8);
+                    break;
+                case 'pow2':
+                    display.value = Math.pow(currentValue, 2).toFixed(8);
+                    break;
+                case 'pow3':
+                    display.value = Math.pow(currentValue, 3).toFixed(8);
+                    break;
+                case 'exp':
+                    display.value = Math.exp(currentValue).toFixed(8);
+                    break;
+                case 'fact':
+                    if (currentValue < 0 || !Number.isInteger(currentValue)) {
+                        display.value = 'Error';
+                    } else {
+                        display.value = factorial(Math.round(currentValue));
+                    }
+                    break;
+                case 'abs':
+                    display.value = Math.abs(currentValue).toFixed(8);
+                    break;
+                case '1/x':
+                    display.value = currentValue !== 0 ? (1 / currentValue).toFixed(8) : 'Error';
+                    break;
+                case 'deg':
+                    isDegreeMode = !isDegreeMode;
+                    alert(`Switched to ${isDegreeMode ? 'DEGREE' : 'RADIAN'} mode`);
+                    break;
+                case 'pow':
+                    display.value += '^';
+                    break;
+            }
+        }
+
+        async function calculateScientific() {
+            const expression = document.getElementById('scientificDisplay').value;
+            if (!expression) return;
+
+            try {
+                // Replace ^ with ** for JavaScript evaluation
+                let jsExpression = expression.replace(/\^/g, '**');
+                // Replace π and e
+                jsExpression = jsExpression.replace(/π/g, Math.PI).replace(/e/g, Math.E);
+                
+                const result = eval(jsExpression);
+                document.getElementById('scientificDisplay').value = parseFloat(result.toFixed(8));
+
+                // Save to backend
+                await fetch(`${API_URL}/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        expression: expression,
+                        result: parseFloat(result.toFixed(8)).toString()
+                    })
+                });
+
+                // Refresh history
+                loadHistory();
+            } catch (error) {
+                document.getElementById('scientificDisplay').value = 'Error';
+                setTimeout(clearScientificDisplay, 1500);
+            }
+        }
+
+        // Financial Calculator Functions
+        async function calculateFinancial() {
+            const principal = parseFloat(document.getElementById('principal').value);
+            const rate = parseFloat(document.getElementById('rate').value);
+            const time = parseFloat(document.getElementById('time').value);
+            const calcType = document.getElementById('calcType').value;
+
+            if (!principal || !rate || !time) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/financial/calculate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        principal,
+                        rate,
+                        time,
+                        calculation_type: calcType
+                    })
+                });
+
+                const data = await response.json();
+                const resultDiv = document.getElementById('financialResult');
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `<strong>Result:</strong> $${data.result}<br><small>${data.expression}</small>`;
+
+                // Refresh history
+                loadHistory();
+            } catch (error) {
+                alert('Error calculating: ' + error.message);
+            }
+        }
+
+        // History Functions
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${API_URL}/history`);
+                const history = await response.json();
+                displayHistory(history);
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+
+        function displayHistory(history) {
+            const container = document.getElementById('historyContainer');
+            
+            if (history.length === 0) {
+                container.innerHTML = '<div class="empty-history">No calculations yet</div>';
+                return;
+            }
+
+            container.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <div>
+                        <div class="history-expression">${item.expression}</div>
+                        <div class="history-result">= ${item.result}</div>
+                        <div class="history-time">${new Date(item.timestamp).toLocaleString()}</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteHistoryItem(${item.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        async function deleteHistoryItem(id) {
+            try {
+                await fetch(`${API_URL}/history/${id}`, { method: 'DELETE' });
+                loadHistory();
+            } catch (error) {
+                alert('Error deleting item: ' + error.message);
+            }
+        }
+
+        async function clearHistory() {
+            if (!confirm('Are you sure you want to clear all history?')) return;
+            
+            try {
+                await fetch(`${API_URL}/history`, { method: 'DELETE' });
+                loadHistory();
+            } catch (error) {
+                alert('Error clearing history: ' + error.message);
+            }
+        }
+
+        // Load history on page load
+        loadHistory();
+    </script>
+</body>
+</html>
