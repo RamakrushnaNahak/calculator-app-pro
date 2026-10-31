@@ -41,3 +41,6 @@ Thumbs.db
 
 # Exclude frontend folder (we use root files for deployment)
 frontend/
+
+# Exclude backend folder (not needed for Vercel deployment)
+backend/
