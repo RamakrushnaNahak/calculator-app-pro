@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 Calculator App</h1>
+
+        <!-- Basic Calculator -->
+        <div class="calculator-section">
+            <h2 class="section-title">Basic Calculator</h2>
+            <input type="text" class="display" id="display" readonly value="">
+            <div class="buttons">
+                <button class="clear" onclick="clearDisplay()">C</button>
+                <button class="operator" onclick="appendToDisplay('(')">(</button>
+                <button class="operator" onclick="appendToDisplay(')')">)</button>
+                <button class="operator" onclick="appendToDisplay('/')">÷</button>
+                
+                <button class="number" onclick="appendToDisplay('7')">7</button>
+                <button class="number" onclick="appendToDisplay('8')">8</button>
+                <button class="number" onclick="appendToDisplay('9')">9</button>
+                <button class="operator" onclick="appendToDisplay('*')">×</button>
+                
+                <button class="number" onclick="appendToDisplay('4')">4</button>
+                <button class="number" onclick="appendToDisplay('5')">5</button>
+                <button class="number" onclick="appendToDisplay('6')">6</button>
+                <button class="operator" onclick="appendToDisplay('-')">−</button>
+                
+                <button class="number" onclick="appendToDisplay('1')">1</button>
+                <button class="number" onclick="appendToDisplay('2')">2</button>
+                <button class="number" onclick="appendToDisplay('3')">3</button>
+                <button class="operator" onclick="appendToDisplay('+')">+</button>
+                
+                <button class="number" onclick="appendToDisplay('0')">0</button>
+                <button class="number" onclick="appendToDisplay('.')">.</button>
+                <button class="equals" onclick="calculate()">=</button>
+            </div>
+        </div>
+
+        <!-- Scientific Calculator -->
+        <div class="calculator-section">
+            <h2 class="section-title">Scientific Calculator</h2>
+            <input type="text" class="scientific-display" id="scientificDisplay" readonly value="">
+            <div class="scientific-buttons">
+                <button class="scientific" onclick="scientificFunction('sin')">sin</button>
+                <button class="scientific" onclick="scientificFunction('cos')">cos</button>
+                <button class="scientific" onclick="scientificFunction('tan')">tan</button>
+                <button class="scientific" onclick="scientificFunction('log')">log</button>
+                <button class="scientific" onclick="scientificFunction('ln')">ln</button>
+                
+                <button class="scientific" onclick="scientificFunction('asin')">sin⁻¹</button>
+                <button class="scientific" onclick="scientificFunction('acos')">cos⁻¹</button>
+                <button class="scientific" onclick="scientificFunction('atan')">tan⁻¹</button>
+                <button class="scientific" onclick="scientificFunction('sqrt')">√</button>
+                <button class="scientific" onclick="scientificFunction('pow')">x^y</button>
+                
+                <button class="scientific" onclick="scientificFunction('pow2')">x²</button>
+                <button class="scientific" onclick="scientificFunction('pow3')">x³</button>
+                <button class="scientific" onclick="scientificFunction('exp')">e^x</button>
+                <button class="scientific" onclick="scientificFunction('fact')">n!</button>
+                <button class="scientific" onclick="scientificFunction('abs')">|x|</button>
+                
+                <button class="scientific" onclick="scientificAppend('π')">π</button>
+                <button class="scientific" onclick="scientificAppend('e')">e</button>
+                <button class="scientific" onclick="scientificAppend('(')">(</button>
+                <button class="scientific" onclick="scientificAppend(')')">)</button>
+                <button class="scientific" onclick="scientificAppend('^')">^</button>
+                
+                <button class="number" onclick="scientificAppend('7')">7</button>
+                <button class="number" onclick="scientificAppend('8')">8</button>
+                <button class="number" onclick="scientificAppend('9')">9</button>
+                <button class="operator" onclick="scientificAppend('/')">÷</button>
+                <button class="clear" onclick="clearScientificDisplay()">C</button>
+                
+                <button class="number" onclick="scientificAppend('4')">4</button>
+                <button class="number" onclick="scientificAppend('5')">5</button>
+                <button class="number" onclick="scientificAppend('6')">6</button>
+                <button class="operator" onclick="scientificAppend('*')">×</button>
+                <button class="operator" onclick="scientificAppend('%')">%</button>
+                
+                <button class="number" onclick="scientificAppend('1')">1</button>
+                <button class="number" onclick="scientificAppend('2')">2</button>
+                <button class="number" onclick="scientificAppend('3')">3</button>
+                <button class="operator" onclick="scientificAppend('-')">−</button>
+                <button class="equals" onclick="calculateScientific()">=</button>
+                
+                <button class="number" onclick="scientificAppend('0')">0</button>
+                <button class="number" onclick="scientificAppend('.')">.</button>
+                <button class="scientific" onclick="scientificFunction('1/x')">1/x</button>
+                <button class="operator" onclick="scientificAppend('+')">+</button>
+                <button class="scientific" onclick="scientificFunction('deg')">DEG</button>
+            </div>
+        </div>
+
+        <!-- Financial Calculator -->
+        <div class="calculator-section">
+            <h2 class="section-title">Financial Calculator</h2>
+            <div class="financial-form">
+                <div class="form-group">
+                    <label for="principal">Principal Amount ($)</label>
+                    <input type="number" id="principal" placeholder="e.g., 10000" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="rate">Interest Rate (%)</label>
+                    <input type="number" id="rate" placeholder="e.g., 5" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="time">Time (years)</label>
+                    <input type="number" id="time" placeholder="e.g., 5" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="calcType">Calculation Type</label>
+                    <select id="calcType">
+                        <option value="loan">Loan Payment</option>
+                        <option value="compound">Compound Interest</option>
+                        <option value="simple">Simple Interest</option>
+                    </select>
+                </div>
+            </div>
+            <button class="calculate-btn" onclick="calculateFinancial()">Calculate</button>
+            <div class="financial-result" id="financialResult"></div>
+        </div>
+
+        <!-- History -->
+        <div class="calculator-section">
+            <h2 class="section-title">Calculation History</h2>
+            <div class="history-container" id="historyContainer">
+                <div class="empty-history">No calculations yet</div>
+            </div>
+            <button class="clear-history-btn" onclick="clearHistory()">Clear All History</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

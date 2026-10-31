@@ -1,7 +1,5 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
@@ -67,8 +65,18 @@ def save_history(history: List[dict]):
 # Basic calculator endpoints
 @app.get("/")
 async def root():
-    """Serve the frontend HTML file"""
-    return FileResponse("index.html")
+    """API information"""
+    return {
+        "name": "Calculator API",
+        "version": "1.0.0",
+        "description": "Backend API for calculator application",
+        "endpoints": {
+            "health": "/health",
+            "calculate": "/calculate",
+            "financial_calculate": "/financial/calculate",
+            "history": "/history"
+        }
+    }
 
 @app.get("/health")
 async def health_check():

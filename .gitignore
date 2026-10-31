@@ -24,7 +24,7 @@ wheels/
 *.egg
 
 # History file
-calculator_history.json
+backend/calculator_history.json
 
 # IDE
 .vscode/
