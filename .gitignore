@@ -38,3 +38,6 @@ backend/calculator_history.json
 Thumbs.db
 
 .vercel
+
+# Exclude frontend folder (we use root files for deployment)
+frontend/
